@@ -1,0 +1,27 @@
+# 1. Preprocessing
+
+1. Parsing
+2. Tokenization
+   1. use nltk.tokenize.word_tokenize
+   2. add pos tag
+3. Normalization
+   1. lemmatize the word with its pos tag
+4. Index construction
+   1. A simple inverted index is not enough. Need positional index at least.
+
+# 2. Query
+
+1. Tokenization (?)
+2. Normalization
+3. Index lookup
+4. Evaluate
+
+# Questions
+
+- where is backtick?!
+- some weird chars (\u....) are in inverted index
+- seems like some punctuation tokens are slipping to inv. index
+- why is inv. index small (only 16mb)?
+- maybe there is extra information other than metadata.csv
+
+python 3.8.6
