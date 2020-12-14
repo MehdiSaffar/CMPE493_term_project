@@ -106,7 +106,7 @@ class Preprocessor:
         doc_df[['id', 'tokens']].apply(add_to_inverted_index_apply, axis=1)
         print('Built inverted index')
 
-    def save(inverted_index_filename: str)
+    def save(self, inverted_index_filename: str):
         print('=> Saving inverted index...')
         # Save inverted index in JSON format.
         with open("data/inverted_index.json", "w") as file:
