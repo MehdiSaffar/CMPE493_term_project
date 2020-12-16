@@ -79,11 +79,7 @@ class Preprocessor:
     def save(self, inverted_index_filename: str):
         print('=> Saving inverted index...')
         # Save inverted index in JSON format.
-        with open("data/inverted_index.json", "w") as file:
+        with open(inverted_index_filename, "w") as file:
             json.dump(self.inverted_index, file, default=serialize_sets, indent=2)
         print('Saved inverted index')
 
-if __name__ == '__main__':
-    preprocessor = Preprocessor()
-    preprocessor.run(metadata_filename='./data/metadata.feather')
-    preprocessor.save(inverted_index_filename='./data/inverted_index.json')
