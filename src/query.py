@@ -31,7 +31,8 @@ class QueryEngine:
         return final_list
 
     def print(self, documents: list):
-        print("Your documents: ")
+        # query-id Q0 document-id rank score STANDARD
+        # print("Your documents: ")
         for document in documents:
             print(document, end=" ")
 
