@@ -6,7 +6,7 @@ if __name__ == '__main__':
     query_engine = QueryEngine()
 
     # Load inverted index
-    query_engine.load_inverted_index('./data/inverted_index.json')
+    query_engine.load_tf_idf_index('./data/tfidf.json')
 
     # Parse user input
     query = sys.argv[1]

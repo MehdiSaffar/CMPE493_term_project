@@ -15,7 +15,7 @@ class Evaluator:
     
     def init_query_engine(self):
         self.query_engine = QueryEngine()
-        self.query_engine.load_inverted_index(self.inverted_index_filename)
+        self.query_engine.load_tf_idf_index(self.inverted_index_filename)
     
     def iter_topics(self):
         """

@@ -9,16 +9,26 @@ import pandas as pd
 from nltk.corpus import wordnet as wn
 from pandarallel import pandarallel
 from .tokenizer import Tokenizer
+import math
+import copy
 
 # pandarallel.initialize(progress_bar=True)
 
 def serialize_sets(obj):
     return sorted(list(obj)) if isinstance(obj, set) else obj
 
+def get_idf(N, doc_count):
+    return math.log10(N / doc_count)
+
+def get_tf_idf_weight(tf, idf):
+    return 1 + math.log10(tf) * idf
+
 class Preprocessor:
     def __init__(self) -> None:
         super().__init__()
         self.tf = defaultdict(lambda: defaultdict(int))
+        self.idf = defaultdict(lambda: defaultdict(int))
+        self.tfidf_weight = defaultdict(lambda: defaultdict(int))
 
     def parse_eval_file(self, eval_filename: str):
         df = pd.read_csv(eval_filename, delim_whitespace=True, names="topic_id iteration_id doc_id relevance".split())
@@ -59,7 +69,7 @@ class Preprocessor:
 
         doc_df['text'] = doc_df['title'] + ' ' + doc_df['abstract']
 
-        print(len(doc_df))
+        # print(len(doc_df))
         # return
 
         doc_df = doc_df.convert_dtypes()
@@ -69,23 +79,13 @@ class Preprocessor:
         doc_df['tokens'] = self.tokenize(doc_df, 'text')
         print('Tokenized documents')
 
-        print('=> Building idf index...')
         
-        
-        # tf(t, d) number of times t occurs in d
-        # mapping from t => d
-
+        print('=> Building tf-idf index...')
+        # tf(t, d) number of times t occurs in d, mapping from t => d
         # df(t): number of docs that contain t (at least once)
-
-        ['token1', 'token2'] <-- query
-
-        tf[token][doc_id] = 343232 <-- 
-        tf[doc_id][token] = 343232
-
-        df[token] = 312
-        idf[token] = 3123
-
         # idf(t): log_10(N/df(t)) where N is total number of documents in the collection
+        # tf-idf_weight(t,d): (1 + log_10(tf(t,d))) * log_10(N / df(t))
+        #                     (1 + log_10(tf(t,d))) * idf(t)
 
         def add_to_tf_apply(row: pd.Series):
             for token in row['tokens']:    
@@ -93,31 +93,17 @@ class Preprocessor:
 
         doc_df[['id', 'tokens']].apply(add_to_tf_apply, axis=1)
 
+        self.tfidf_weight = copy.deepcopy(self.tf)
         for token, docs in self.tf.items():
-            self.idf[token] = math.log10(len(doc_df) / len(docs))
+            idf = get_idf(len(doc_df), len(docs))
+            for doc, tf in docs.items():
+                self.tfidf_weight[token][doc] = get_tf_idf_weight(tf, idf)
 
-        print('Built inverted index')
+        print('Built tf-idf index')
 
-    def save(self, inverted_index_filename: str):
-        print('=> Saving inverted index...')
-        # Save inverted index in JSON format.
-        with open(inverted_index_filename, "w") as file:
-            json.dump(self.inverted_index, file, default=serialize_sets, indent=2)
-        print('Saved inverted index')
-
-        print('=> Saving idf...')
-        # Save inverted document frequency in JSON format.
-        with open(inverted_index_filename, "w") as file:
-            json.dump(self.inverted_index, file, default=serialize_sets, indent=2)
-        print('Saved idf')
-
-        print('=> Saving tf...')
+    def save(self, tfidf_weight_filename: str):
+        print('=> Saving tfidf weights...')
         # Save term frequency in JSON format.
-        with open(inverted_index_filename, "w") as file:
-            json.dump(self.inverted_index, file, default=serialize_sets, indent=2)
-        print('Saved tf')
-        # Save term frequency in JSON format.
-        with open(inverted_index_filename, "w") as file:
-            json.dump(self.inverted_index, file, default=serialize_sets, indent=2)
-        print('Saved tf')
-
+        with open(tfidf_weight_filename, "w") as file:
+            json.dump(self.tfidf_weight, file, indent=2)
+        print('Saved tfidf weights')
