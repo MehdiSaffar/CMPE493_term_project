@@ -18,7 +18,7 @@ def serialize_sets(obj):
 class Preprocessor:
     def __init__(self) -> None:
         super().__init__()
-        self.inverted_index = defaultdict(set)
+        self.tf = defaultdict(lambda: defaultdict(int))
 
     def parse_eval_file(self, eval_filename: str):
         df = pd.read_csv(eval_filename, delim_whitespace=True, names="topic_id iteration_id doc_id relevance".split())
@@ -64,16 +64,38 @@ class Preprocessor:
 
         doc_df = doc_df.convert_dtypes()
         # doc_df = doc_df.head(37924)
+        doc_df = doc_df.head(5_000)
         print('=> Tokenizing documents...')
         doc_df['tokens'] = self.tokenize(doc_df, 'text')
         print('Tokenized documents')
 
-        print('=> Building inverted index...')
-        def add_to_inverted_index_apply(row: pd.Series):
-            for token in row['tokens']:
-                self.inverted_index[token].add(row['id'])
+        print('=> Building idf index...')
+        
+        
+        # tf(t, d) number of times t occurs in d
+        # mapping from t => d
 
-        doc_df[['id', 'tokens']].apply(add_to_inverted_index_apply, axis=1)
+        # df(t): number of docs that contain t (at least once)
+
+        ['token1', 'token2'] <-- query
+
+        tf[token][doc_id] = 343232 <-- 
+        tf[doc_id][token] = 343232
+
+        df[token] = 312
+        idf[token] = 3123
+
+        # idf(t): log_10(N/df(t)) where N is total number of documents in the collection
+
+        def add_to_tf_apply(row: pd.Series):
+            for token in row['tokens']:    
+                self.tf[token][row['id']] += 1
+
+        doc_df[['id', 'tokens']].apply(add_to_tf_apply, axis=1)
+
+        for token, docs in self.tf.items():
+            self.idf[token] = math.log10(len(doc_df) / len(docs))
+
         print('Built inverted index')
 
     def save(self, inverted_index_filename: str):
@@ -82,4 +104,20 @@ class Preprocessor:
         with open(inverted_index_filename, "w") as file:
             json.dump(self.inverted_index, file, default=serialize_sets, indent=2)
         print('Saved inverted index')
+
+        print('=> Saving idf...')
+        # Save inverted document frequency in JSON format.
+        with open(inverted_index_filename, "w") as file:
+            json.dump(self.inverted_index, file, default=serialize_sets, indent=2)
+        print('Saved idf')
+
+        print('=> Saving tf...')
+        # Save term frequency in JSON format.
+        with open(inverted_index_filename, "w") as file:
+            json.dump(self.inverted_index, file, default=serialize_sets, indent=2)
+        print('Saved tf')
+        # Save term frequency in JSON format.
+        with open(inverted_index_filename, "w") as file:
+            json.dump(self.inverted_index, file, default=serialize_sets, indent=2)
+        print('Saved tf')
 
