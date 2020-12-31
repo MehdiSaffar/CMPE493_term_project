@@ -74,7 +74,7 @@ class Preprocessor:
 
         doc_df = doc_df.convert_dtypes()
         # doc_df = doc_df.head(37924)
-        doc_df = doc_df.head(5_000)
+        #doc_df = doc_df.head(5_000)
         print('=> Tokenizing documents...')
         doc_df['tokens'] = self.tokenize(doc_df, 'text')
         print('Tokenized documents')
