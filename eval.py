@@ -39,10 +39,11 @@ class Evaluator:
                 yield topic
     
     @staticmethod
-    def format_eval_line(topic, doc_rank, doc_id):
+    def format_eval_line(topic, doc_rank, doc_id, doc_score):
         # query-id Q0 document-id rank score STANDARD
         # TODO: not sure what to put for score here
-        return f"{topic.number} Q0 {doc_id} {doc_rank} {doc_rank} STANDARD\n"   
+        # As stated in the lecture, our score function will be put to the score.
+        return f"{topic.number} Q0 {doc_id} {doc_rank} {doc_score} STANDARD\n"   
 
     def run(self):
         results = ""
@@ -50,12 +51,13 @@ class Evaluator:
             # print(topic.number, topic.query)
             doc_ids = self.query_engine.query(topic.query)
             for doc_rank, doc_id in enumerate(doc_ids, start=1):
-                results += Evaluator.format_eval_line(topic, doc_rank, doc_id)
+                # doc_id is a tuple of (doc_id, score)
+                results += Evaluator.format_eval_line(topic, doc_rank, doc_id[0], doc_id[1])
         return results
 
 if __name__ == '__main__':
     evaluator = Evaluator(
-        inverted_index_filename='./data/inverted_index.json',
+        inverted_index_filename='./data/tfidf.json',
         topic_filename='./data/topics-rnd5.xml'
     )
     results = evaluator.run()
