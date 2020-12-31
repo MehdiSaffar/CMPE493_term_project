@@ -24,6 +24,11 @@ class QueryEngine:
     def get_tf_idf_score(self, tokens):
         score = defaultdict(int)
         for token in tokens:
+            # assume token is 'post-infection'
+            # it may not appear in our tf-idf dictionary as a key
+            # if that's the case, score of will not be incremented.
+            if token not in self.tfidf_weight:
+                continue
             for doc in self.tfidf_weight[token]:
                 tfidf = self.tfidf_weight[token][doc]
                 score[doc] += tfidf
