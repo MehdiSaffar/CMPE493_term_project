@@ -50,9 +50,9 @@ class Evaluator:
         for topic in self.iter_dev_topics():
             # print(topic.number, topic.query)
             doc_ids = self.query_engine.query(topic.query)
-            for doc_rank, doc_id in enumerate(doc_ids, start=1):
+            for doc_rank, (doc_id, score) in enumerate(doc_ids, start=1):
                 # doc_id is a tuple of (doc_id, score)
-                results += Evaluator.format_eval_line(topic, doc_rank, doc_id[0], doc_id[1])
+                results += Evaluator.format_eval_line(topic, doc_rank, doc_id, score)
         return results
 
 if __name__ == '__main__':
