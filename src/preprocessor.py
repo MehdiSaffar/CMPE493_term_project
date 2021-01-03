@@ -11,17 +11,10 @@ from pandarallel import pandarallel
 from .tokenizer import Tokenizer
 import math
 import copy
+from .utils import serialize_sets, get_tf_idf_weight, get_idf
 
 # pandarallel.initialize(progress_bar=True)
 
-def serialize_sets(obj):
-    return sorted(list(obj)) if isinstance(obj, set) else obj
-
-def get_idf(N, doc_count):
-    return math.log10(N / doc_count)
-
-def get_tf_idf_weight(tf, idf):
-    return (1 + math.log10(tf)) * idf
 
 class Preprocessor:
     def __init__(self) -> None:

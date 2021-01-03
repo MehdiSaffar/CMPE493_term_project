@@ -4,18 +4,22 @@ import xml.etree.ElementTree as ET
 import sys
 from collections import namedtuple
 
+from src.utils import serialize_sets, get_tf_idf_weight, get_idf
+
 Topic = namedtuple('Topic', 'number query question narrative')
 
 class Evaluator:
-    def __init__(self, inverted_index_filename: str, topic_filename: str) -> None:
+    def __init__(self, inverted_index_filename: str, idf_filename: str, topic_filename: str) -> None:
         super().__init__()
         self.inverted_index_filename = inverted_index_filename
+        self.idf_filename = idf_filename
         self.topic_filename = topic_filename
         self.init_query_engine()
     
     def init_query_engine(self):
         self.query_engine = QueryEngine()
         self.query_engine.load_tf_idf_index(self.inverted_index_filename)
+        self.query_engine.load_idf_index(self.idf_filename)
     
     def iter_topics(self):
         """
@@ -37,6 +41,7 @@ class Evaluator:
         for topic in self.iter_topics():
             if topic.number % 2 == 1:
                 yield topic
+                break
     
     @staticmethod
     def format_eval_line(topic, doc_rank, doc_id, doc_score):
@@ -58,6 +63,7 @@ class Evaluator:
 if __name__ == '__main__':
     evaluator = Evaluator(
         inverted_index_filename='./data/tfidf.json',
+        idf_filename='./data/idf.json',
         topic_filename='./data/topics-rnd5.xml'
     )
     results = evaluator.run()

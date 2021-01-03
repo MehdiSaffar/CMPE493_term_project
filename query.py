@@ -8,6 +8,9 @@ if __name__ == '__main__':
     # Load inverted index
     query_engine.load_tf_idf_index('./data/tfidf.json')
 
+    # Load idf
+    query_engine.load_idf_index('./data/idf.json')
+
     # Parse user input
     query = sys.argv[1]
 
@@ -15,4 +18,6 @@ if __name__ == '__main__':
     doc_list = query_engine.query(query)
     
     # Show outputs
-    query_engine.print(doc_list)
+    for doc_id, doc_score in doc_list:
+        print(doc_id, doc_score)
+        # query_engine.print(doc_list)
