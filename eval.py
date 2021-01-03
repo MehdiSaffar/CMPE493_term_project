@@ -41,7 +41,7 @@ class Evaluator:
         for topic in self.iter_topics():
             if topic.number % 2 == 1:
                 yield topic
-                break
+                # break
     
     @staticmethod
     def format_eval_line(topic, doc_rank, doc_id, doc_score):
