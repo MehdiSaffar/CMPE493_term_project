@@ -93,17 +93,24 @@ class Preprocessor:
 
         doc_df[['id', 'tokens']].apply(add_to_tf_apply, axis=1)
 
+        self.idf = defaultdict(float)
         self.tfidf_weight = copy.deepcopy(self.tf)
         for token, docs in self.tf.items():
-            idf = get_idf(len(doc_df), len(docs))
+            self.idf[token] = get_idf(len(doc_df), len(docs))
             for doc, tf in docs.items():
-                self.tfidf_weight[token][doc] = get_tf_idf_weight(tf, idf)
+                self.tfidf_weight[token][doc] = get_tf_idf_weight(tf, self.idf[token])
 
         print('Built tf-idf index')
 
-    def save(self, tfidf_weight_filename: str):
+    def save(self, tfidf_weight_filename: str, idf_filename: str):
         print('=> Saving tfidf weights...')
         # Save term frequency in JSON format.
         with open(tfidf_weight_filename, "w") as file:
             json.dump(self.tfidf_weight, file, indent=2)
         print('Saved tfidf weights')
+
+        print('=> Saving idf...')
+        # Save inverse document frequency in JSON format.
+        with open(idf_filename, "w") as file:
+            json.dump(self.idf, file, indent=2)
+        print('Saved idf')
