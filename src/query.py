@@ -1,6 +1,5 @@
 # Imports
 from collections import Counter, defaultdict
-from sklearn.metrics.pairwise import cosine_similarity
 from numpy.core.fromnumeric import sort
 from src import preprocessor
 from src.preprocessor import get_tf_idf_weight
