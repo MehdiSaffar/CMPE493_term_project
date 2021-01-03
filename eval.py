@@ -1,3 +1,4 @@
+from os import error
 from typing import NamedTuple
 from src.query import QueryEngine
 import xml.etree.ElementTree as ET
@@ -34,12 +35,12 @@ class Evaluator:
             narrative = topic.find('narrative').text
             yield Topic(number, query, question, narrative)
 
-    def iter_dev_topics(self):
+    def iter_dev_topics(self, use_odd: bool):
         """
         Iterate over development (odd numbered) topics only
         """
         for topic in self.iter_topics():
-            if topic.number % 2 == 1:
+            if topic.number % 2 == (1 if use_odd else 0):
                 yield topic
                 # break
     
@@ -50,9 +51,9 @@ class Evaluator:
         # As stated in the lecture, our score function will be put to the score.
         return f"{topic.number} Q0 {doc_id} {doc_rank} {doc_score} STANDARD\n"   
 
-    def run(self):
+    def run(self, use_odd: bool):
         results = ""
-        for topic in self.iter_dev_topics():
+        for topic in self.iter_dev_topics(use_odd):
             # print(topic.number, topic.query)
             doc_ids = self.query_engine.query(topic.query)
             for doc_rank, (doc_id, score) in enumerate(doc_ids, start=1):
@@ -60,11 +61,13 @@ class Evaluator:
                 results += Evaluator.format_eval_line(topic, doc_rank, doc_id, score)
         return results
 
+
 if __name__ == '__main__':
+    use_odd = sys.argv[1] == 'odd'
     evaluator = Evaluator(
         inverted_index_filename='./data/tfidf.json',
         idf_filename='./data/idf.json',
         topic_filename='./data/topics-rnd5.xml'
     )
-    results = evaluator.run()
+    results = evaluator.run(use_odd=use_odd)
     print(results)
