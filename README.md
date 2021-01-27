@@ -53,3 +53,9 @@ After above command, evaluation result will be outputted to the terminal in the 
 ```
 <query-id> Q0 <document-id> <rank> <score> STANDARD
 ```
+
+### Evaluation Metrics
+To see mAP, ndcg and P.10 metric values, use:
+```bash
+$ python script_trec_eval.py [GROUND_TRUTH_ADDRESS] [RESULT_ADDRESS] 
+```
