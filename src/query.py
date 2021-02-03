@@ -31,10 +31,13 @@ class QueryEngine:
 
     def get_tf_idf_score(self, tokens):
         # calculate query vector
-        tokens = list(sorted(set(tokens)))
-        query_vec = [0] * len(tokens)
-        for token_index, token in enumerate(tokens):
+        # Query vector should contain the number of occurrance of that token.
+        unique_tokens = list(sorted(set(tokens)))
+        query_vec = [0] * len(unique_tokens)
+        for token in tokens:
+            token_index = unique_tokens.index(token)
             query_vec[token_index] += 1
+        tokens = unique_tokens # since remaining code follows "tokens" name.
 
         for token_index, token in enumerate(tokens):
             token_idf = self.idf.get(token)
