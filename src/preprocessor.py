@@ -27,7 +27,7 @@ class Preprocessor:
         df = pd.read_csv(eval_filename, delim_whitespace=True, names="topic_id iteration_id doc_id relevance".split())
         df = df.convert_dtypes()
         return df
-    
+
     def tokenize(self, df: pd.DataFrame, col: str):
         tokenizer = Tokenizer()
         def tokenize_apply(value: str):
@@ -42,11 +42,11 @@ class Preprocessor:
         # doc_df = doc_df[['cord_uid', 'title', 'abstract']]
         # doc_df = doc_df.rename({'cord_uid': 'id'}, axis=1)
         # print('Loaded metadata file')
-
+        #
         # print('=> Saving metadata feather file...')
         # doc_df.to_feather('./data/metadata.feather')
         # print('Saved metadata feather file...')
-        # return 
+        # return
 
         print('=> Loading metadata feather file...')
         doc_df = pd.read_feather(metadata_filename)
@@ -72,7 +72,7 @@ class Preprocessor:
         doc_df['tokens'] = self.tokenize(doc_df, 'text')
         print('Tokenized documents')
 
-        
+
         print('=> Building tf-idf index...')
         # tf(t, d) number of times t occurs in d, mapping from t => d
         # df(t): number of docs that contain t (at least once)
@@ -81,7 +81,7 @@ class Preprocessor:
         #                     (1 + log_10(tf(t,d))) * idf(t)
 
         def add_to_tf_apply(row: pd.Series):
-            for token in row['tokens']:    
+            for token in row['tokens']:
                 self.tf[token][row['id']] += 1
 
         doc_df[['id', 'tokens']].apply(add_to_tf_apply, axis=1)
