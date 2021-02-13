@@ -86,6 +86,27 @@ class Preprocessor:
 
         doc_df[['id', 'tokens']].apply(add_to_tf_apply, axis=1)
 
+        # save tf for bm25 scoring function.
+        with open("./data/tf.json", "w") as file:
+            json.dump(self.tf, file, indent=2)
+
+        # store document length (in words) of each document in a dict.
+        # also find the average document length
+        # this is necessary for bm25 scoring function.
+        doc_lengths = dict()
+        for index, row in doc_df.iterrows():
+            doc_length = len(row['tokens'])
+            doc_lengths[row['id']] = doc_length
+        
+        average_doc_length = sum(list(doc_lengths.values())) / len(doc_lengths)
+
+        for key in doc_lengths:
+            doc_lengths[key] = doc_lengths[key] / average_doc_length
+        
+        # save doc_lengths for bm25 scoring function.
+        with open("./data/doc_lengths_normalized.json", "w") as file:
+            json.dump(doc_lengths, file, indent=2)
+
         self.idf = defaultdict(float)
         self.tfidf_weight = copy.deepcopy(self.tf)
         for token, docs in self.tf.items():

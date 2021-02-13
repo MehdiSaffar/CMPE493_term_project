@@ -29,64 +29,57 @@ class QueryEngine:
         with open(idf_filename) as file:
             self.idf = json.load(file)
 
-    def get_tf_idf_score(self, tokens):
-        # calculate query vector
-        # Query vector should contain the number of occurrance of that token.
-        unique_tokens = list(sorted(set(tokens)))
-        query_vec = [0] * len(unique_tokens)
-        for token in tokens:
-            token_index = unique_tokens.index(token)
-            query_vec[token_index] += 1
-        tokens = unique_tokens # since remaining code follows "tokens" name.
+    def get_bm25_score(self, tokens):
 
-        for token_index, token in enumerate(tokens):
-            token_idf = self.idf.get(token)
-            if token_idf is None:  # not sure what to do here
-                query_vec[token_index] = 0
-            else:
-                if query_vec[token_index] != 0:
-                    query_vec[token_index] = get_tf_idf_weight(query_vec[token_index], token_idf)
+        with open("./data/tf.json") as file:
+            tf = json.load(file)
+        
+        with open("./data/doc_lengths_normalized.json") as file:
+            normalized_doc_lengths = json.load(file)
+        
+        
+        # scores will be stored in a dictionary. e.g. key: doc-id, value: bm25_score
+        scores = dict()
+        
+        # open for experimentation.
+        k = 1.2
+        b = 0.75
 
-        # query1 1, 0, 1
-        # doc1   2, 5, 0, 0...
-        # doc2   2, 0, 3, 0...
+        for doc_id, normalized_doc_length in normalized_doc_lengths.items():
+            sum_of_query_word_scores = 0
 
-        # query 1 1 1 | magnitude of entire vector = sqrt(1 1 1 0 0 0 0 ...)
-        # doc1  5 0 3 | magnitude of entire vector = sqrt(5 0 3 5 3 1 9...)
-        # doc2  0 2 2 |
+            for query_word in tokens:
+                idf = self.idf.get(query_word)
+                if idf is None:
+                    # this means, query word does not exist in vocabulary.
+                    idf = get_idf(len(normalized_doc_lengths), 0)
+                
+                temp = tf.get(query_word)
+                if temp is None:
+                    # if query word does not appear in the corpus, tf value will be 0.
+                    continue
+                
+                tf_val = temp.get(doc_id, 0) # if query word does not appear in that doc, tf will be 0
+                if tf_val == 0:
+                    continue
 
-        # calculate vector of each doc
-        docs_vec_mag = defaultdict(int)
-        docs_vec = defaultdict(lambda: [0] * len(query_vec))  # {doc_id: [vector of the doc]}
-        for token_index, token in enumerate(tokens):
-            docs_containing_token = self.tfidf_weight.get(token)
-            if not docs_containing_token:  # not sure
-                continue
+                # check the denominator if it becomes zero
+                # if it becomes zero, continue with the next query word
+                denominator = tf_val + (k * ( 1 - b + b * normalized_doc_length))
+                if denominator == 0:
+                    continue
 
-            for doc_id, doc_tfidf in docs_containing_token.items():
-                docs_vec[doc_id][token_index] = doc_tfidf
+                # perform the summation of this query word
+                sum_of_query_word_scores += idf * (tf_val * (k+1)) / denominator
 
-        for token, token_docs in self.tfidf_weight.items():
-            for doc_id, doc_tfidf in token_docs.items():
-                docs_vec_mag[doc_id] += doc_tfidf ** 2
-
-        for doc_id, doc_vec_mag in docs_vec_mag.items():
-            docs_vec_mag[doc_id] = math.sqrt(doc_vec_mag)
-
-        # calculate cos similarity of query to each document
-        doc_similarity = defaultdict(int)
-
-        for doc_id, doc_vec in docs_vec.items():
-            doc_similarity[doc_id] = np.dot(doc_vec, query_vec) / (docs_vec_mag[doc_id] * np.linalg.norm(query_vec))
-            # if doc_similarity[doc_id] == 1:
-            #     print(np.dot(doc_vec, query_vec), docs_vec_mag[doc_id], np.linalg.norm(query_vec))
-            # doc_similarity[doc_id] = cosine_similarity([query_vec], [doc_vec])[0][0]
-
-        return doc_similarity
+            # update that documents score
+            scores[doc_id] = sum_of_query_word_scores
+        
+        return scores
 
     def query(self, query: str):
         tokens = self.tokenizer.tokenize(query)
-        score = self.get_tf_idf_score(tokens)
+        score = self.get_bm25_score(tokens)
 
         # get a list of (doc_id, score) tuples sorted by score in descending order
         docs = sorted(score.items(), key=lambda pair: pair[1], reverse=True)
