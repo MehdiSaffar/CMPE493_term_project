@@ -42,7 +42,7 @@ class QueryEngine:
         scores = dict()
         
         # open for experimentation.
-        k = 1.2
+        k = 1.5
         b = 0.75
 
         for doc_id, normalized_doc_length in normalized_doc_lengths.items():
@@ -62,7 +62,8 @@ class QueryEngine:
                 tf_val = temp.get(doc_id, 0) # if query word does not appear in that doc, tf will be 0
                 if tf_val == 0:
                     continue
-
+                
+                #BM25 - robertson
                 # check the denominator if it becomes zero
                 # if it becomes zero, continue with the next query word
                 denominator = tf_val + (k * ( 1 - b + b * normalized_doc_length))
@@ -70,8 +71,29 @@ class QueryEngine:
                     continue
 
                 # perform the summation of this query word
-                sum_of_query_word_scores += idf * (tf_val * (k+1)) / denominator
+                sum_of_query_word_scores += idf * ( (tf_val * (k+1)) / denominator)
 
+                '''
+                # Bm25+ 
+                # check the denominator if it becomes zero
+                # if it becomes zero, continue with the next query word
+                denominator = tf_val + (k * ( 1 - b + b * normalized_doc_length))
+                if denominator == 0:
+                    continue
+
+                # perform the summation of this query word
+                # alpha value is special for bm25+ model. default value is suggested to be 1.
+                alpha = 1
+                sum_of_query_word_scores += idf * ( (tf_val * (k+1)) / denominator + alpha)
+                '''
+
+                '''
+                # bm25L
+                alpha = 0.5
+                c = tf_val / ( 1 - b + b * normalized_doc_length)
+                sum_of_query_word_scores += idf * ( (k + 1) * (c + alpha) / (k + c + alpha) )
+                '''
+                
             # update that documents score
             scores[doc_id] = sum_of_query_word_scores
         
