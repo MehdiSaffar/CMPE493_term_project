@@ -21,6 +21,8 @@ Make sure the following files exist inside `./data` folder:
 - File containing evaluations of queries: `eval.txt`
 - File containing topics: `topics-rnd5.xml`
 
+You can reach to these files at https://drive.google.com/drive/folders/16B-1OyVe5S8wHQQASW9NSrK70KU3ziJ7?usp=sharing . 
+
 To preprocess the documents run the following command:
 ```bash
 $ python prep.py
@@ -42,7 +44,7 @@ $ python query.py "virus origin"
 
 ### Evaluation
 
-Make sure `./trec_eval` executable exists in the current directory folder. We've automated the evaluation by using that executable file.
+Make sure `./trec_eval` executable exists in the current directory folder. We've automated the evaluation by using that executable file. However, if it does not work, our results are saved as `./data/results.txt`. One can manually run trec_eval scripts with that results. 
 
 For odd topics use:
 ```bash
