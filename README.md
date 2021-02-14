@@ -11,7 +11,7 @@ Using Python 3.8.6
 ## How to Run
 
 ### Requirements
-There are multiple libraries that we've used in this project. These libraries with their versions are listed in `./requirements.txt` file. Don't forget to install these libraries into your virtual environment.
+There are multiple libraries that we've used in this project. These libraries with their versions are listed in `./requirements.txt` file. Don't forget to install these libraries into your virtual environment. We've experienced some problems in Windows OS while installing the dependencies. Other than Windows, we didn't experienced any problem in other operating systems.
 
 ### Preprocessing
 Normally for the preprocessing we would use `./data/metadata.csv` but we found that reading csv file is too slow. We decided to use `feather` file format instead which is much faster and helps us iterate quickly.
