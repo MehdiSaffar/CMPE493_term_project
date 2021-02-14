@@ -41,6 +41,9 @@ $ python query.py "virus origin"
 ```
 
 ### Evaluation
+
+Make sure `./trec_eval` executable exists in the current directory folder. We've automated the evaluation by using that executable file.
+
 For odd topics use:
 ```bash
 $ python eval.py odd
@@ -51,8 +54,4 @@ For even topics use:
 $ python eval.py even
 ```
 
-After above command, evaluation result will be outputted to the terminal in the below format:
-
-```
-<query-id> Q0 <document-id> <rank> <score> STANDARD
-```
+After above command "mAP", "ndcg" and "P.10" metrics will be outputted to the terminal.
