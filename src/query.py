@@ -62,7 +62,6 @@ class QueryEngine:
                 tf_val = temp.get(doc_id, 0) # if query word does not appear in that doc, tf will be 0
                 if tf_val == 0:
                     continue
-                
                 '''
                 #BM25 - robertson
                 # check the denominator if it becomes zero
@@ -74,7 +73,6 @@ class QueryEngine:
                 # perform the summation of this query word
                 sum_of_query_word_scores += idf * ( (tf_val * (k+1)) / denominator)
                 '''
-
                 # Bm25+ 
                 # check the denominator if it becomes zero
                 # if it becomes zero, continue with the next query word
@@ -86,7 +84,6 @@ class QueryEngine:
                 # alpha value is special for bm25+ model. default value is suggested to be 1.
                 alpha = 1
                 sum_of_query_word_scores += idf * ( (tf_val * (k+1)) / denominator + alpha)
-
                 '''
                 # bm25L
                 alpha = 0.5

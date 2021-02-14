@@ -11,7 +11,7 @@ def get_idf(N, doc_count):
     return (N + 1) / doc_count
     
     # below is for bm25L
-    # return math.log( ( N + 1 ) / (doc_count + 0.5) )
+    # return math.log( ( N + 1 ) / (doc_count + 0.5) )
 
 def get_tf_idf_weight(tf, idf):
     return (1 + math.log10(tf)) * idf
