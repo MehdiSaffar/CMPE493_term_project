@@ -5,10 +5,10 @@ def serialize_sets(obj):
 
 def get_idf(N, doc_count):
     # idf formulation differs from model to model. below formulation is for bm25.
-    return math.log(1 + ( (N - doc_count + 0.5) / (doc_count + 0.5) ) )
+    # return math.log(1 + ( (N - doc_count + 0.5) / (doc_count + 0.5) ) )
     
     # below is for bm25+
-    # return (N + 1) / doc_count
+    return (N + 1) / doc_count
     
     # below is for bm25L
     # return math.log( ( N + 1 ) / (doc_count + 0.5) )
