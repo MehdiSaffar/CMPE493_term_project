@@ -1,4 +1,5 @@
 # CMPE 493 - Term Project 2020
+Retrieve most relevant documents to the query from the TREC-COVID Complete dataset. More details in `project_description.pdf`.
 
 Using Python 3.8.6
 
